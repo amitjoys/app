@@ -7,6 +7,10 @@ import Dashboard from "./pages/Dashboard";
 import Pricing from "./pages/Pricing";
 import Blog from "./pages/Blog";
 import Contact from "./pages/Contact";
+import AdminLogin from "./pages/AdminLogin";
+import AdminLayout from "./components/AdminLayout";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminPricing from "./pages/AdminPricing";
 import { Toaster } from "./components/ui/toaster";
 
 function App() {
@@ -21,6 +25,13 @@ function App() {
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/contact" element={<Contact />} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="pricing" element={<AdminPricing />} />
+          </Route>
         </Routes>
         <Toaster />
       </BrowserRouter>

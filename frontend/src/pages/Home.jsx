@@ -203,7 +203,7 @@ const Home = () => {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {mockPricingPlans.map((plan) => (
+            {pricingPlans.map((plan) => (
               <Card 
                 key={plan.id} 
                 className={`relative border-2 transition-all duration-300 hover:shadow-xl ${

@@ -279,11 +279,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-      </div>
-
-      <Footer />
-    </div>
-  );
-};
-
-export default Dashboard;

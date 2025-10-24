@@ -1,15 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { CheckCircle2 } from 'lucide-react';
-import { mockPricingPlans } from '../mock';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { pricingAPI } from '../services/api';
 
 const Pricing = () => {
   const navigate = useNavigate();
+  const [pricingPlans, setPricingPlans] = useState([]);
+
+  useEffect(() => {
+    fetchPricingPlans();
+  }, []);
+
+  const fetchPricingPlans = async () => {
+    try {
+      const plans = await pricingAPI.getPlans();
+      setPricingPlans(plans);
+    } catch (error) {
+      console.error('Failed to fetch pricing plans:', error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">

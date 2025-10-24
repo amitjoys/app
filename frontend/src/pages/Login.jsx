@@ -6,6 +6,7 @@ import { Label } from '../components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Sparkles } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
+import { authAPI } from '../services/api';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -20,30 +21,26 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
 
-    // Mock login - replace with actual API call
-    setTimeout(() => {
-      if (formData.email && formData.password) {
-        localStorage.setItem('token', 'mock-token-' + Date.now());
-        localStorage.setItem('user', JSON.stringify({
-          email: formData.email,
-          name: formData.email.split('@')[0]
-        }));
-        
-        toast({
-          title: 'Success',
-          description: 'Logged in successfully!'
-        });
-        
-        navigate('/dashboard');
-      } else {
-        toast({
-          title: 'Error',
-          description: 'Please fill in all fields',
-          variant: 'destructive'
-        });
-      }
+    try {
+      const response = await authAPI.login(formData);
+      localStorage.setItem('token', response.token);
+      localStorage.setItem('user', JSON.stringify(response.user));
+      
+      toast({
+        title: 'Success',
+        description: 'Logged in successfully!'
+      });
+      
+      navigate('/dashboard');
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error.response?.data?.detail || 'Login failed',
+        variant: 'destructive'
+      });
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (

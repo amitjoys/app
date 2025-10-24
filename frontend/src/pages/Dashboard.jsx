@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -7,10 +7,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { Badge } from '../components/ui/badge';
 import { Progress } from '../components/ui/progress';
 import { Search, TrendingUp, MessageSquare, Lightbulb, Download } from 'lucide-react';
-import { mockInsights, mockUserData } from '../mock';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useToast } from '../hooks/use-toast';
+import { authAPI, userAPI, insightsAPI } from '../services/api';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -18,8 +18,30 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searching, setSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
-  const [insights, setInsights] = useState(mockInsights);
-  const [userData] = useState(mockUserData);
+  const [insights, setInsights] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  const fetchUserData = async () => {
+    try {
+      const [user, credits] = await Promise.all([
+        authAPI.getMe(),
+        userAPI.getCredits()
+      ]);
+      setUserData({ ...user, credits });
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
+      if (error.response?.status === 401) {
+        navigate('/login');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -35,15 +57,24 @@ const Dashboard = () => {
 
     setSearching(true);
     
-    // Mock search - replace with actual API call
-    setTimeout(() => {
+    try {
+      const results = await insightsAPI.search(searchQuery);
+      setInsights(results);
       setShowResults(true);
-      setSearching(false);
+      await fetchUserData(); // Refresh credits
       toast({
         title: 'Success',
         description: 'Insights generated successfully!'
       });
-    }, 2000);
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error.response?.data?.detail || 'Failed to generate insights',
+        variant: 'destructive'
+      });
+    } finally {
+      setSearching(false);
+    }
   };
 
   const handleExport = (type) => {
@@ -52,6 +83,19 @@ const Dashboard = () => {
       description: `Exporting insights as ${type}...`
     });
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+        <Navbar />
+        <div className="flex items-center justify-center h-96">
+          <div className="text-center">
+            <div className="text-gray-600">Loading...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">

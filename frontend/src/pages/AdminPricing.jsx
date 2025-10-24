@@ -140,8 +140,8 @@ const AdminPricing = () => {
 
   return (
     <div>
-      <div className=\"flex justify-between items-center mb-8\">
-        <h1 className=\"text-3xl font-bold text-gray-900\">Pricing Plans</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Pricing Plans</h1>
         <Dialog open={isDialogOpen} onOpenChange={(open) => {
           setIsDialogOpen(open);
           if (!open) resetForm();

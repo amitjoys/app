@@ -6,6 +6,7 @@ import { Label } from '../components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Sparkles } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
+import { authAPI } from '../services/api';
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -32,13 +33,11 @@ const Signup = () => {
 
     setLoading(true);
 
-    // Mock signup - replace with actual API call
-    setTimeout(() => {
-      localStorage.setItem('token', 'mock-token-' + Date.now());
-      localStorage.setItem('user', JSON.stringify({
-        email: formData.email,
-        name: formData.name
-      }));
+    try {
+      const { confirmPassword, ...registerData } = formData;
+      const response = await authAPI.register(registerData);
+      localStorage.setItem('token', response.token);
+      localStorage.setItem('user', JSON.stringify(response.user));
       
       toast({
         title: 'Success',
@@ -46,8 +45,15 @@ const Signup = () => {
       });
       
       navigate('/dashboard');
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error.response?.data?.detail || 'Registration failed',
+        variant: 'destructive'
+      });
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
